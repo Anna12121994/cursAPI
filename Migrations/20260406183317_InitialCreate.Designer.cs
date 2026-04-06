@@ -11,7 +11,7 @@ using PlantShop.API.Data;
 namespace PlantShop.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260406175618_InitialCreate")]
+    [Migration("20260406183317_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
