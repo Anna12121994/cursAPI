@@ -23,6 +23,7 @@ namespace PlantShop.API.Controllers
             _configuration = configuration;
         }
 
+        //  (Customer)
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
@@ -30,7 +31,7 @@ namespace PlantShop.API.Controllers
 
             if (existingUser != null)
             {
-                return BadRequest("Користувач з таким email вже існує");
+                return BadRequest("Користувач вже існує");
             }
 
             var user = new User
@@ -47,6 +48,7 @@ namespace PlantShop.API.Controllers
             return Ok("Реєстрація успішна");
         }
 
+        //  ЛОГІН
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
@@ -69,9 +71,11 @@ namespace PlantShop.API.Controllers
             return Ok(token);
         }
 
+        //  JWT
         private string GenerateJwtToken(User user)
         {
             var jwtSettings = _configuration.GetSection("Jwt");
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
