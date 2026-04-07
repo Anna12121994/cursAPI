@@ -21,10 +21,53 @@ namespace PlantShop.API.Controllers
         //  ВСІ 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+    string? search,
+    string? category,
+    string? sortBy,
+    int page = 1,
+    int pageSize = 6)
         {
-            var products = await _context.Products.ToListAsync();
-            return Ok(products);
+            var query = _context.Products.AsQueryable();
+
+            // пошук назва
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Name.Contains(search));
+            }
+
+            // фільтр категорії
+            if (!string.IsNullOrEmpty(category))
+            {
+                query = query.Where(p => p.Category == category);
+            }
+
+            // сорт
+            query = sortBy switch
+            {
+                "price_asc" => query.OrderBy(p => p.Price),
+                "price_desc" => query.OrderByDescending(p => p.Price),
+                "name_asc" => query.OrderBy(p => p.Name),
+                "name_desc" => query.OrderByDescending(p => p.Name),
+                _ => query.OrderBy(p => p.Id)
+            };
+
+            
+            var totalItems = await query.CountAsync();
+
+            // паг
+            var products = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                TotalItems = totalItems,
+                Page = page,
+                PageSize = pageSize,
+                Items = products
+            });
         }
 
         //  ADMIN
